@@ -1,11 +1,5 @@
-//
-//  main.swift
-//  SeaWars
-//
-//  Created by Данил Мельник on 25.01.2022.
-//
-
 import Foundation
 
-print("Hello, World!")
-
+var battle = Battlefield()
+battle.field = battle.createField()
+battle.Show()
