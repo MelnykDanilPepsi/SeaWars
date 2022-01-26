@@ -2,9 +2,9 @@ import Foundation
 
 struct Ship
 {
-    private var status: Array<Bool>
+    private var status: Array<Bool> = []
     
-    func generateShips(bigShip: UInt8,mediumShip: UInt8,littleShip: UInt8,smalletsShip: UInt8) -> Array<Ship>
+    public func generateShips(bigShip: UInt8,mediumShip: UInt8,littleShip: UInt8,smalletsShip: UInt8) -> Array<Ship>
     {
         var tmpArr: Array<Ship> = []
         AddShip(arr: &tmpArr, pos: bigShip,count: 4)
@@ -38,4 +38,5 @@ struct Ship
             i+=1
         }
     }
+    
 }
