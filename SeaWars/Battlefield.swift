@@ -40,8 +40,7 @@ class Battlefield
         }
         return tmpArr
     }
-    func shot(coordinaties: String) -> Bool
-    {
+    func shot(coordinaties: String) -> Bool{
         if field[getIDbyName(name: coordinaties)].showStatus == " "
         {
             
@@ -49,12 +48,11 @@ class Battlefield
         return false
     }
     
-    func getIDbyName(name:String) -> Int
-    {
+    func getIDbyName(name:String) -> Int{
         Int(field.firstIndex{$0.name == name}!)
     }
-    func getFieldByName(name:String) -> Square
-    {
+    
+    func getFieldByName(name:String) -> Square{
         for sq in field
         {
             if sq.name == name {
@@ -85,65 +83,77 @@ class Battlefield
         }
         return -1
     }
-    private func checkVerticalUp(coordinaties: Int,count : Int8) -> Bool
+    private func checkVertical(coordinaties: Int,count : Int8) -> Bool
     {
         var flag = false
-        if coordinaties + (Int(coordinaties) * 10) < 99
-        {
-            flag = checkMechUp(coordinaties: coordinaties, count: count, leftOrRight: 0)
-            if flag == false {return false}
-            if coordinaties % 9 != 0{
-               flag = checkMechUp(coordinaties: coordinaties, count: count, leftOrRight: 1)
-                if flag == false {return false}
-            }
-            if coordinaties % 8 != 0{
-                flag = checkMechUp(coordinaties: coordinaties, count: count, leftOrRight: 2)
-                 if flag == false {return false}
-            }
-            if coordinaties % 11 != 0{
-                flag = checkMechUp(coordinaties: coordinaties, count: count, leftOrRight: -2)
-                 if flag == false {return false}
-            }
-            if coordinaties % 10 != 0{
-                flag = checkMechUp(coordinaties: coordinaties, count: count, leftOrRight: -1)
-                 if flag == false {return false}
+        if coordinaties + (Int(coordinaties) * 10) < 99{
+            var i = 0, lofr = 2, modul = 8  //left or right side, and modul
+            while i < 4 {
+                if coordinaties % modul != 0 {
+                    flag = checkMechVertical(coordinaties: coordinaties, count: count, leftOrRight: lofr)
+                     if flag == false {return false}
+                }
+                i+=1
+                lofr -= 1
+                modul += 1
             }
             flag = true
-            return flag
-        }
-        if coordinaties - (Int(coordinaties) * 10) > 0
-        {
-            
         }
         return flag
     }
     
-    private func checkMechUp(coordinaties: Int,count : Int8,leftOrRight lofr: Int) -> Bool
+    private func checkHorizontal(coordinaties: Int,count : Int8) -> Bool
     {
+        var flag = false
+        if coordinaties + (Int(coordinaties)) < 99{
+            var i = 0, lofr = 2, modul = 8  //left or right side, and modul
+            
+        }
+    }
+    
+    private func checkMechVertical(coordinaties: Int,count : Int8,leftOrRight lofr: Int) -> Bool
+    {
+        if mechVericalTop(coordinaties: coordinaties) { return false}
         var coord = coordinaties
-        while coord < coord + Int(count * 10)
-        {
-            if (field[coord+lofr].status == 2)
-            {
-                return false
-            }
+        while coord < coord + Int(count * 10) {
+            if (field[coord+lofr].status == 2) { return false }
             coord += 10
         }
-        if coord < field.count - 19
-        {
-            if field[coord+10].status == 2 || field[coord+20].status == 2
-            {
+        if mechVericalDown(coordinaties: coordinaties) == false { return false }
+        return true
+    }
+    
+   
+    private func mechVericalDown(coordinaties: Int) -> Bool
+    {
+        if coordinaties < field.count - 19{
+            if field[coordinaties+10].status == 2 || field[coordinaties+19].status == 2{
                 return false
             }
             return true
         }
-        if coord < field.count - 9
-        {
-            if field[coord+10].status == 2
+        if coordinaties < field.count - 9{
+            if field[coordinaties+10].status == 2
             {
                 return false
             }
+        return true
         }
+    }
+        
+    private func mechVericalTop(coordinaties: Int) -> Bool
+    {
+        if coordinaties > 19{
+            if field[coordinaties-10].status == 2 || field[coordinaties-20].status == 2{
+                return false
+            }
+            return true
+        }
+        if coordinaties < field.count - 9{
+            if field[coordinaties+10].status == 2
+            {
+                return false
+            }
         return true
     }
     
