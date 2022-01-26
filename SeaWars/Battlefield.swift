@@ -8,7 +8,7 @@ class Battlefield
     {
         var showStatus: String
         var name: String
-        var status: Int8  //0 - clear, 1 - falseShoot, 2 - corable
+        var status:UInt8 = 0
     }
     
     enum Flags : String{
@@ -40,15 +40,18 @@ class Battlefield
             for num in 1...10
             {
                 tmpArr.append(Square(showStatus: Flags.emptyShot.rawValue,
-                                     name: String(leter) + String(num),
-                                     status: 0))
+                                     name: String(leter) + String(num),status: 0))
             }
         }
         return tmpArr
     }
     func shot(coordinaties: String) -> Bool
     {
-        field[getIDbyName(name: name)].status == 
+        if field[getIDbyName(name: coordinaties)].showStatus == " "
+        {
+            
+        }
+        return false
     }
     
     func getIDbyName(name:String) -> Int
@@ -63,7 +66,7 @@ class Battlefield
                 return sq
             }
         }
-        return Square(showStatus: "", name: "", status: -1)
+        return Square(showStatus: "", name: "",status: -1)
     }
     func Show()
     {
