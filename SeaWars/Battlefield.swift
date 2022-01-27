@@ -91,24 +91,32 @@ class Battlefield
     }
     private func getOneSquareByCoord(coordinaties: Int) -> Square { field[coordinaties] }
 
-    private func checkSquareVertical(arr: Array<Square>,firstCoord:Int) -> Bool{
-        if checkSquare(arr: arr,vertical:true){ return false}
+    private func checkSquareVertical(arr: Array<Square>,firstCoord:Int) -> Bool {
+        if !checkSquare(arr: arr,vertical:true){ return false}
         if firstCoord % 9 != 0{
-            if !checkNaighbors(count: 2, num: 1, coord: firstCoord, countArr: Int8(arr.count), leftUpOrRightDown: false, vertical: true){
+            if !checkNaighbors(num: 1, coord: firstCoord, countArr: Int8(arr.count), leftUpOrRightDown: false, vertical: true){
                 return false
             }
         }
         if firstCoord % 10 != 0{
-            if !checkNaighbors(count: 2, num: -1, coord: firstCoord, countArr: Int8(arr.count), leftUpOrRightDown: false, vertical: true){
+            if !checkNaighbors(num: -1, coord: firstCoord, countArr: Int8(arr.count), leftUpOrRightDown: false, vertical: true){
                 return false
             }
         }
         return true
     }
-    private func checkNaighbors(count:Int,num:Int,coord: Int, countArr: Int8, leftUpOrRightDown lofr: Bool, vertical vh: Bool) -> Bool
+    private func checkSquareHorizon(arr:Array<Square>,firstCoord:Int)->Bool{
+        if !checkSquare(arr: arr, vertical: false){ return false }
+        if !checkVertical(arr: arr){return false}
+        if firstCoord + 10 >= 99{
+            if !checkNaighbors(num: 10, coord: firstCoord, countArr: Int8(arr.count), leftUpOrRightDown: false, vertical: false)
+        }
+    }
+    
+    private func checkNaighbors(num:Int,coord: Int, countArr: Int8, leftUpOrRightDown lofr: Bool, vertical vh: Bool) -> Bool
     {
         var i = 0, neighbor : Array<Square>, n = num
-        while i < count{
+        while i < 2{
             neighbor = getArrSquare(startCoordinaties: coord+n, count: countArr, leftUpOrRightDown: lofr, vertical: vh)
             if !checkSquare(arr: neighbor, vertical: vh){
                 return false
@@ -123,6 +131,9 @@ class Battlefield
         if vertical && index - 9 > 0{
             if field[index-9].status == 2 { return false }
         }
+        if !vertical && index - 1 > 0{
+            if field[index-1].status == 2 { return false }
+        }
         for sq in arr {
             if sq.status == 2 { return false }
         }
@@ -130,8 +141,22 @@ class Battlefield
         if vertical && index + 9 < 99{
             if field[index+9].status == 2 { return false }
         }
+        if !vertical && index + 1 < 99{
+            if field[index+1].status == 2 { return false }
+        }
         return true
     }
+    private func checkVertical(arr:Array<Square>) -> Bool{
+        
+        var i = 0
+        if indexFieldByElem(square: arr[0]) % 9 == 0 {return false}
+        if indexFieldByElem(square: arr[arr.count-1]) % 10 == 0 {return false}
+        if arr.count > 2 && indexFieldByElem(square: arr[0]) % 8 == 0 || arr.count > 3 && indexFieldByElem(square: arr[0]) % 7 == 0
+        {return false}
+        
+        return true
+    }
+    
     
     private func indexFieldByElem(square:Square) -> Int
     {
