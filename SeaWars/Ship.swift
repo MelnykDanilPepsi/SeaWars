@@ -3,7 +3,7 @@ import Foundation
 struct Ship
 {
     private var status: Array<Bool> = []
-    
+    func getLenght() -> Int{ status.count }
     public func generateShips(bigShip: UInt8,mediumShip: UInt8,littleShip: UInt8,smalletsShip: UInt8) -> Array<Ship>
     {
         var tmpArr: Array<Ship> = []

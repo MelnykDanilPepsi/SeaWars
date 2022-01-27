@@ -4,7 +4,6 @@ class Battlefield
 {
     var field: Array<Square> = []
     var ships: Array<Ship> = []
-    
     struct Square
     {
         var showStatus: String
@@ -68,21 +67,30 @@ class Battlefield
     }
    private func AddAllShips(arr:Array<Square>) -> Void
     {
+        var tmpArr : Array<Square>
         ships = Ship().generateShips(bigShip: 1,mediumShip: 2,littleShip: 3,smalletsShip: 4)
-        var c:UInt8 = 0, pos:Bool = false //pos: false - vertical
+        var c = 0//pos: false - vertical
         for ship in ships
         {
-            
+            c = Int.random(in: 1...99)
+            tmpArr = getArrSquare(startCoordinaties: c, count: Int8(ship.getLenght()), vertical: true)
+            if checkVertical(arr: tmpArr){
+                
+            }
+            if ship.getLenght() != 1{
+                tmpArr = getArrSquare(startCoordinaties: c, count: Int8(ship.getLenght()), vertical: false)
+                if checkVertical(arr: tmpArr) {
+                    
+                }
+            }
         }
     }
-    private func getArrSquare(startCoordinaties coord:Int, count:Int8,leftUpOrRightDown lofr: Bool,vertical vh: Bool) -> Array<Square>{
+    private func getArrSquare(startCoordinaties coord:Int, count:Int8,vertical vh: Bool) -> Array<Square>{
     //left|up - true //  / horizon - true
         var tmpArr : Array<Square> = [],i = 0, c=count
         while i < count{
-            if vh && lofr { tmpArr.append(field[coord - Int(c * 10)])}
-            else if vh && !lofr { tmpArr.append(field[coord + Int(c * 10)])}
-            else if !vh && lofr { tmpArr.append(field[coord - Int(c)]) }
-            else { tmpArr.append(field[coord + Int(c)]) }
+            if vh {tmpArr.append(field[coord + Int(c * 10)])}
+            if !vh {tmpArr.append(field[coord + Int(c)])}
             c-=1
             i+=1
             return tmpArr
@@ -94,30 +102,30 @@ class Battlefield
     private func checkSquareVertical(arr: Array<Square>,firstCoord:Int) -> Bool {
         if !checkSquare(arr: arr,vertical:true){ return false}
         if firstCoord % 9 != 0{
-            if !checkNaighbors(num: 1, coord: firstCoord, countArr: Int8(arr.count), leftUpOrRightDown: false, vertical: true){
-                return false
-            }
+            if !checkNaighbors(num: 1, coord: firstCoord, countArr: Int8(arr.count), vertical: true){return false}
         }
         if firstCoord % 10 != 0{
-            if !checkNaighbors(num: -1, coord: firstCoord, countArr: Int8(arr.count), leftUpOrRightDown: false, vertical: true){
-                return false
-            }
+            if !checkNaighbors(num: -1, coord: firstCoord, countArr: Int8(arr.count), vertical: true){return false}
         }
         return true
     }
     private func checkSquareHorizon(arr:Array<Square>,firstCoord:Int)->Bool{
         if !checkSquare(arr: arr, vertical: false){ return false }
         if !checkVertical(arr: arr){return false}
-        if firstCoord + 10 >= 99{
-            if !checkNaighbors(num: 10, coord: firstCoord, countArr: Int8(arr.count), leftUpOrRightDown: false, vertical: false)
+        if firstCoord + 10 <= 99{
+            if !checkNaighbors(num: 10, coord: firstCoord, countArr: Int8(arr.count), vertical: false){return false}
         }
+        if firstCoord - 10 >= 0{
+            if !checkNaighbors(num: -10, coord: firstCoord, countArr: Int8(arr.count), vertical: false){return false}
+        }
+        return true
     }
     
-    private func checkNaighbors(num:Int,coord: Int, countArr: Int8, leftUpOrRightDown lofr: Bool, vertical vh: Bool) -> Bool
+    private func checkNaighbors(num:Int,coord: Int, countArr: Int8, vertical vh: Bool) -> Bool
     {
         var i = 0, neighbor : Array<Square>, n = num
         while i < 2{
-            neighbor = getArrSquare(startCoordinaties: coord+n, count: countArr, leftUpOrRightDown: lofr, vertical: vh)
+            neighbor = getArrSquare(startCoordinaties: coord+n, count: countArr, vertical: vh)
             if !checkSquare(arr: neighbor, vertical: vh){
                 return false
             }
@@ -148,7 +156,6 @@ class Battlefield
     }
     private func checkVertical(arr:Array<Square>) -> Bool{
         
-        var i = 0
         if indexFieldByElem(square: arr[0]) % 9 == 0 {return false}
         if indexFieldByElem(square: arr[arr.count-1]) % 10 == 0 {return false}
         if arr.count > 2 && indexFieldByElem(square: arr[0]) % 8 == 0 || arr.count > 3 && indexFieldByElem(square: arr[0]) % 7 == 0
