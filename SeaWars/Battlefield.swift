@@ -64,96 +64,42 @@ class Battlefield
    private func AddAllShips(arr:Array<Square>) -> Void
     {
         ships = Ship().generateShips(bigShip: 1,mediumShip: 2,littleShip: 3,smalletsShip: 4)
-        var c:UInt8 = 0, pos:UInt8 = 0 //pos: 1 - vertical, 2 - horizon
+        var c:UInt8 = 0, pos:Bool = false //pos: false - vertical
         for ship in ships
         {
-            var flag:Bool = false
-            while !flag{
-            c = UInt8.random(in: 0...99)
-            
-            }
-        }
-    }
-    
-    private func checkFieldVerical(coordinaties:UInt8,count:UInt8) -> Int8 //-1 false, 1 - up / 2 - down
-    {
-        if coordinaties % 9 == 0 || coordinaties % 10 == 0
-        {
-            
-        }
-        return -1
-    }
-    private func checkVertical(coordinaties: Int,count : Int8) -> Bool
-    {
-        var flag = false
-        if coordinaties + (Int(coordinaties) * 10) < 99{
-            var i = 0, lofr = 2, modul = 8  //left or right side, and modul
-            while i < 4 {
-                if coordinaties % modul != 0 {
-                    flag = checkMechVertical(coordinaties: coordinaties, count: count, leftOrRight: lofr)
-                     if flag == false {return false}
-                }
-                i+=1
-                lofr -= 1
-                modul += 1
-            }
-            flag = true
-        }
-        return flag
-    }
-    
-    private func checkHorizontal(coordinaties: Int,count : Int8) -> Bool
-    {
-        var flag = false
-        if coordinaties + (Int(coordinaties)) < 99{
-            var i = 0, lofr = 2, modul = 8  //left or right side, and modul
             
         }
     }
-    
-    private func checkMechVertical(coordinaties: Int,count : Int8,leftOrRight lofr: Int) -> Bool
-    {
-        if mechVericalTop(coordinaties: coordinaties) { return false}
-        var coord = coordinaties
-        while coord < coord + Int(count * 10) {
-            if (field[coord+lofr].status == 2) { return false }
-            coord += 10
+    private func getArrSquare(startCoordinaties coord:Int, count:Int8,leftUpOrRightDown lofr: Bool,vertical vh: Bool) -> Array<Square>{
+    //left|up - true //  / horizon - true
+        var tmpArr : Array<Square> = [],i = 0, c=count
+        while i < count{
+            if vh && lofr { tmpArr.append(field[coord - Int(c * 10)])}
+            else if vh && !lofr { tmpArr.append(field[coord + Int(c * 10)])}
+            else if !vh && lofr { tmpArr.append(field[coord - Int(c)]) }
+            else { tmpArr.append(field[coord + Int(c)]) }
+            c-=1
+            i+=1
+            return tmpArr
         }
-        if mechVericalDown(coordinaties: coordinaties) == false { return false }
+        return tmpArr
+    }
+    private func getOneSquare(coordinaties: Int) -> Square { field[coordinaties] }
+    
+    private func checkSquareVertical(arr: Array<Square>,firstCoord:Int) -> Bool{
+        var flag = false, coord = 8, index = 0
+        flag = checkSquare(arr: arr)
+        if !flag{ return false }
+        while index < 2 {
+            
+            index+=1
+        }
         return true
     }
-    
-   
-    private func mechVericalDown(coordinaties: Int) -> Bool
-    {
-        if coordinaties < field.count - 19{
-            if field[coordinaties+10].status == 2 || field[coordinaties+19].status == 2{
-                return false
-            }
-            return true
+    private func checkSquare(arr:Array<Square>) -> Bool{
+        for sq in arr {
+            if sq.status == 2 { return false }
         }
-        if coordinaties < field.count - 9{
-            if field[coordinaties+10].status == 2
-            {
-                return false
-            }
-        return true
-        }
-    }
-        
-    private func mechVericalTop(coordinaties: Int) -> Bool
-    {
-        if coordinaties > 19{
-            if field[coordinaties-10].status == 2 || field[coordinaties-20].status == 2{
-                return false
-            }
-            return true
-        }
-        if coordinaties < field.count - 9{
-            if field[coordinaties+10].status == 2
-            {
-                return false
-            }
         return true
     }
     
@@ -181,3 +127,6 @@ class Battlefield
         print("*-miss|X-hit|•-clear")
     }
 }
+    
+
+
