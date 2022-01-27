@@ -10,6 +10,11 @@ class Battlefield
         var showStatus: String
         var name: String
         var status: Int8 = 0  //0 - clear, 1 - killed, 2 - ship exist, -1 - error(nil)
+        func compareSquare(sq:Square)->Bool
+        {
+            if self.showStatus == sq.showStatus && self.name == sq.name && self.status == sq.status { return true }
+            return false
+        }
     }
     
     enum Flags : String{
@@ -84,25 +89,59 @@ class Battlefield
         }
         return tmpArr
     }
-    private func getOneSquare(coordinaties: Int) -> Square { field[coordinaties] }
-    
+    private func getOneSquareByCoord(coordinaties: Int) -> Square { field[coordinaties] }
+
     private func checkSquareVertical(arr: Array<Square>,firstCoord:Int) -> Bool{
-        var flag = false, coord = 8, index = 0
-        flag = checkSquare(arr: arr)
-        if !flag{ return false }
-        while index < 2 {
-            
-            index+=1
+        if checkSquare(arr: arr,vertical:true){ return false}
+        if firstCoord % 9 != 0{
+            if !checkNaighbors(count: 2, num: 1, coord: firstCoord, countArr: Int8(arr.count), leftUpOrRightDown: false, vertical: true){
+                return false
+            }
+        }
+        if firstCoord % 10 != 0{
+            if !checkNaighbors(count: 2, num: -1, coord: firstCoord, countArr: Int8(arr.count), leftUpOrRightDown: false, vertical: true){
+                return false
+            }
         }
         return true
     }
-    private func checkSquare(arr:Array<Square>) -> Bool{
+    private func checkNaighbors(count:Int,num:Int,coord: Int, countArr: Int8, leftUpOrRightDown lofr: Bool, vertical vh: Bool) -> Bool
+    {
+        var i = 0, neighbor : Array<Square>, n = num
+        while i < count{
+            neighbor = getArrSquare(startCoordinaties: coord+n, count: countArr, leftUpOrRightDown: lofr, vertical: vh)
+            if !checkSquare(arr: neighbor, vertical: vh){
+                return false
+            }
+            i+=1
+            n = num * 2
+        }
+        return true
+    }
+    private func checkSquare(arr:Array<Square>,vertical:Bool) -> Bool {
+        var index = indexFieldByElem(square: arr[0])
+        if vertical && index - 9 > 0{
+            if field[index-9].status == 2 { return false }
+        }
         for sq in arr {
             if sq.status == 2 { return false }
         }
+        index = indexFieldByElem(square: arr[arr.count-1])
+        if vertical && index + 9 < 99{
+            if field[index+9].status == 2 { return false }
+        }
         return true
     }
     
+    private func indexFieldByElem(square:Square) -> Int
+    {
+        for (index,sq) in field.enumerated(){
+            if sq.compareSquare(sq: square){
+                return index
+            }
+        }
+        return -1
+    }
     func Show() -> Void
     {
         var count=0
