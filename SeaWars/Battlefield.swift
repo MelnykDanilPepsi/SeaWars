@@ -118,18 +118,17 @@ class Battlefield
     }
     private func getArrSquare(startCoordinaties coord: inout Int, count:Int8,vertical vh: Bool) -> Array<Square>{
     //left|up - true //  / horizon - true
-        var tmpArr : Array<Square> = [],i = 0, c=count
+        var tmpArr : Array<Square> = [],i = 0
+        if coord + Int(count*10) > 99{
+            let t1 = coord + Int(count*10), t2 = coord
+            coord = t2 - (t1 - 99)
+        }
         while i < count{
             if vh {
-                if coord + Int(c*10) > 99{
-                    coord = coord - ((coord + Int(c*10))-99)
-                }
-                tmpArr.append(field[coord + Int(c * 10)])
+                tmpArr.append(field[coord + Int(i * 10)])
             }
-            if !vh {tmpArr.append(field[coord + Int(c)])}
-            c-=1
+            if !vh {tmpArr.append(field[coord + Int(i)])}
             i+=1
-            return tmpArr
         }
         return tmpArr
     }
@@ -219,7 +218,7 @@ class Battlefield
         print("|--------------------|")
         print("|",terminator: "")
         for f in field{
-            print("\(f.shipId) ",terminator: "")
+            print("\(f.name) ",terminator: "")
             i+=1
             if i == 10
             {
