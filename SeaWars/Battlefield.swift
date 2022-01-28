@@ -14,7 +14,7 @@ class Battlefield
         var showStatus: String
         var name: String
         var status: Int8 = 0  //0 - clear, 1 - killed, 2 - ship exist, -1 - error(nil)
-        var shipId = -1 // -1//clear
+        var shipId = 9 // -1//clear
         func compareSquare(sq:Square)->Bool
         {
             if self.showStatus == sq.showStatus && self.name == sq.name && self.status == sq.status { return true }
@@ -40,12 +40,12 @@ class Battlefield
         let letters = String(String.UnicodeScalarView(str.compactMap(UnicodeScalar.init)))
         var tmpArr: Array<Square> = []
                              
-        for leter in letters
+        for num in 1...10
         {
-            for num in 1...10
+            for leter in letters
             {
                 tmpArr.append(Square(showStatus: Flags.emptyShot.rawValue,
-                                     name: String(leter) + String(num),status: 0))
+                                     name:String(num)+String(leter) ,status: 0))
             }
         }
         return tmpArr
@@ -83,19 +83,24 @@ class Battlefield
             tryes = 0
             while flag == false
             {
-            c = Int.random(in: 1...99)
-            tmpArr = getArrSquare(startCoordinaties: &c, count: Int8(ships[index].getLenght()), vertical: true)
-            if checkVertical(arr: tmpArr){
-                addShipOnField(coordinaties: tmpArr, ship: &ships[index], shipId: index)
-            }
-            if ships[index].getLenght() != 1{
-                tmpArr = getArrSquare(startCoordinaties: &c, count: Int8(ships[index].getLenght()), vertical: false)
-                if checkVertical(arr: tmpArr) {
-                    addShipOnField(coordinaties: tmpArr, ship: &ships[index], shipId: index)
+                c = Int.random(in: 1...99)
+                if(ships[index].getLenght() == 1){
+                   
                 }
+                
+            tmpArr = getArrSquare(startCoordinaties: &c, count: Int8(ships[index].getLenght()), vertical: true)
+                if checkSquareVertical(arr: tmpArr, firstCoord: indexFieldByElem(square: tmpArr[0])){
+                addShipOnField(coordinaties: tmpArr, ship: &ships[index], shipId: index)
+                    flag = true
+            }
+                tmpArr = getArrSquare(startCoordinaties: &c, count: Int8(ships[index].getLenght()), vertical: false)
+                if checkSquareHorizon(arr: tmpArr, firstCoord: indexFieldByElem(square: tmpArr[0])) {
+                    addShipOnField(coordinaties: tmpArr, ship: &ships[index], shipId: index)
+                    flag = true
+                
               }
                 tryes+=1
-                if(tryes == 40){ flag = true }
+                if(tryes == 100){ flag = true }
             }
             flag = false
             index+=1
@@ -109,17 +114,17 @@ class Battlefield
     }
     private func addShipOnField(coordinaties:Array<Square>,ship : inout Ship,shipId:Int) -> Void{
         var index = 0
-        for coord in coordinaties{
+        for (i,coord) in coordinaties.enumerated(){
            index = indexFieldByElem(square: coord)
             field[index].status = 2
             field[index].shipId = shipId
-            ship.shipActivated()
+            ship.shipActivated(pos:i, coord: index)
         }
     }
     private func getArrSquare(startCoordinaties coord: inout Int, count:Int8,vertical vh: Bool) -> Array<Square>{
     //left|up - true //  / horizon - true
         var tmpArr : Array<Square> = [],i = 0
-        if coord + Int(count*10) > 99{
+        if coord + Int(count*10) > 99 && vh{
             let t1 = coord + Int(count*10), t2 = coord
             coord = t2 - (t1 - 99)
         }
@@ -132,42 +137,41 @@ class Battlefield
         }
         return tmpArr
     }
-    private func getOneSquareByCoord(coordinaties: Int) -> Square { field[coordinaties] }
+   
 
     private func checkSquareVertical(arr: Array<Square>,firstCoord:Int) -> Bool {
         if !checkSquare(arr: arr,vertical:true){ return false}
-        if firstCoord % 9 != 0{
-            if !checkNaighbors(num: 1, coord: firstCoord, countArr: Int8(arr.count), vertical: true){return false}
+        if firstCoord % 9 != 0 {
+        if !checkNaighbors(num: 1, coord: firstCoord, countArr: Int8(arr.count), vertical: true){return false}
         }
-        if firstCoord % 10 != 0{
+        if firstCoord % 10 != 0 {
             if !checkNaighbors(num: -1, coord: firstCoord, countArr: Int8(arr.count), vertical: true){return false}
         }
         return true
     }
     private func checkSquareHorizon(arr:Array<Square>,firstCoord:Int)->Bool{
         if !checkSquare(arr: arr, vertical: false){ return false }
-        if !checkVertical(arr: arr){return false}
+        if !checkHorizon(arr: arr){return false}
         if firstCoord + 10 <= 99{
             if !checkNaighbors(num: 10, coord: firstCoord, countArr: Int8(arr.count), vertical: false){return false}
         }
         if firstCoord - 10 >= 0{
             if !checkNaighbors(num: -10, coord: firstCoord, countArr: Int8(arr.count), vertical: false){return false}
         }
+        
         return true
     }
     
     private func checkNaighbors(num:Int,coord: Int, countArr: Int8, vertical vh: Bool) -> Bool
     {
-        var i = 0, neighbor : Array<Square>, n = num,tmp = 0
-        while i < 2{
+            var neighbor : Array<Square>, n = num,tmp = 0
             tmp = coord+n
             neighbor = getArrSquare(startCoordinaties: &tmp, count: countArr, vertical: vh)
             if !checkSquare(arr: neighbor, vertical: vh){
                 return false
             }
-            i+=1
             n = num * 2
-        }
+        
         return true
     }
     private func checkSquare(arr:Array<Square>,vertical:Bool) -> Bool {
@@ -190,7 +194,7 @@ class Battlefield
         }
         return true
     }
-    private func checkVertical(arr:Array<Square>) -> Bool{
+    private func checkHorizon(arr:Array<Square>) -> Bool{
         
         if indexFieldByElem(square: arr[0]) % 9 == 0 {return false}
         if indexFieldByElem(square: arr[arr.count-1]) % 10 == 0 {return false}
@@ -212,13 +216,14 @@ class Battlefield
     }
     func Show() -> Void
     {
+        print(ships)
         var count=0
         var i = 0
         print(" A B C D E F G H I J")
         print("|--------------------|")
         print("|",terminator: "")
         for f in field{
-            print("\(f.name) ",terminator: "")
+            print("\(f.status) ",terminator: "")
             i+=1
             if i == 10
             {

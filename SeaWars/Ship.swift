@@ -2,7 +2,7 @@ import Foundation
 
 struct Ship
 {
-    private var status: Array<Bool> = []
+    private var status: Array<Int> = []
     func getLenght() -> Int{ status.count }
     public func generateShips(bigShip: UInt8,mediumShip: UInt8,littleShip: UInt8,smalletsShip: UInt8) -> Array<Ship>
     {
@@ -13,26 +13,22 @@ struct Ship
         AddShip(arr: &tmpArr, pos: smalletsShip,count: 1)
         return tmpArr
     }
-    mutating func shipActivated() -> Void
+    mutating func shipActivated(pos:Int,coord: Int) -> Void
     {
-        var i = 0
-        while i < self.status.count{
-            status[i] = true
-            i+=1
-        }
+        self.status[pos] = coord
     }
     
    mutating func hit(position:Int) -> Void
     {
-        self.status[position] = false
+        self.status[position] = -1
     }
-   private func createShip(count:Int) -> Array<Bool>
+   private func createShip(count:Int) -> Array<Int>
     {
-        var tmp: Array<Bool> = []
+        var tmp: Array<Int> = []
         var i = 0
         while i < count
         {
-            tmp.append(false)
+            tmp.append(-1)
             i+=1
         }
         return tmp
