@@ -8,7 +8,7 @@ class Battlefield
 {
     var field: Array<Square> = []
     var ships: Array<Ship> = []
-    
+    var attempts = 1
     struct Square
     {
         var showStatus: String
@@ -49,13 +49,6 @@ class Battlefield
             }
         }
         return tmpArr
-    }
-    func shot(coordinaties: String) -> Bool{
-        if field[getIDbyName(name: coordinaties)].showStatus == " "
-        {
-            
-        }
-        return false
     }
     
     func getIDbyName(name:String) -> Int{
@@ -121,6 +114,50 @@ class Battlefield
             ship.shipActivated(pos:i, coord: index)
         }
     }
+    func shot(sq:Square) -> Bool
+    {
+        attempts+=1
+        if sq.showStatus == Flags.clearShot.rawValue || sq.showStatus == Flags.trueShot.rawValue
+        {
+            print("Coordinates are wrong!")
+            ReadKey()
+            return false
+        }
+        var index = 0
+        index = indexFieldByElem(square: sq)
+        if sq.status == 0{
+            
+            field[index].showStatus = Flags.clearShot.rawValue
+            print("Miss!")
+            ReadKey()
+            return false
+            
+        }
+        if sq.status == 2{
+            field[index].showStatus = Flags.trueShot.rawValue
+            field[index].status = 1
+            if ships[sq.shipId].hit(position: index){
+                ships.remove(at: sq.shipId)
+                if ships.count == 0 {
+                    return true
+                    print("You win!")
+                    print("Tryes:\(attempts)")
+                }
+            }
+            ReadKey()
+        }
+        
+        return false
+    }
+     func ReadKey()
+    {
+        var i = 0
+        readLine()
+        while i < 5{
+            print("")
+            i+=1
+        }
+    }
     private func getArrSquare(startCoordinaties coord: inout Int, count:Int8,vertical vh: Bool) -> Array<Square>{
     //left|up - true //  / horizon - true
         var tmpArr : Array<Square> = [],i = 0
@@ -158,7 +195,6 @@ class Battlefield
         if firstCoord - 10 >= 0{
             if !checkNaighbors(num: -10, coord: firstCoord, countArr: Int8(arr.count), vertical: false){return false}
         }
-        
         return true
     }
     
@@ -214,16 +250,16 @@ class Battlefield
         }
         return -1
     }
-    func Show() -> Void
+    func Show() -> Bool
     {
-        print(ships)
+        
         var count=0
         var i = 0
         print(" A B C D E F G H I J")
         print("|--------------------|")
         print("|",terminator: "")
         for f in field{
-            print("\(f.status) ",terminator: "")
+            print("\(f.showStatus) ",terminator: "")
             i+=1
             if i == 10
             {
@@ -236,7 +272,13 @@ class Battlefield
             }
         }
         print("--------------------|")
-        print("*-miss|X-hit|•-clear")
+        print("*-miss|X-hit|•-clear|try:\(attempts)")
+        print("Enter coordinaties >>>",terminator: "")
+        let menu = readLine()
+        guard let _ = menu,(menu?.count)! <= 3 && (menu?.count)! >= 2 else {
+            print("Invalid coordinaties ser!")
+            return false }
+        return shot(sq: getFieldByName(name: menu!))
     }
 }
     

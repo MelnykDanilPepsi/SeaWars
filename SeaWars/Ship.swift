@@ -18,9 +18,26 @@ struct Ship
         self.status[pos] = coord
     }
     
-   mutating func hit(position:Int) -> Void
+   mutating func hit(position:Int) -> Bool
     {
-        self.status[position] = -1
+        var i = 0
+        while i < status.count{
+            if status[i] == position{status[i] = -1}
+            i+=1
+        }
+        if !checkStatus(){
+            print("Ship is dead!")
+            return true
+        }
+        return false
+    }
+    private func checkStatus() -> Bool
+    {
+        for s in status
+        {
+            if s == -1{ return false }
+        }
+        return true
     }
    private func createShip(count:Int) -> Array<Int>
     {
