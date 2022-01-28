@@ -13,10 +13,18 @@ struct Ship
         AddShip(arr: &tmpArr, pos: smalletsShip,count: 1)
         return tmpArr
     }
+    mutating func shipActivated() -> Void
+    {
+        var i = 0
+        while i < self.status.count{
+            status[i] = true
+            i+=1
+        }
+    }
     
    mutating func hit(position:Int) -> Void
     {
-        self.status[position] = true
+        self.status[position] = false
     }
    private func createShip(count:Int) -> Array<Bool>
     {

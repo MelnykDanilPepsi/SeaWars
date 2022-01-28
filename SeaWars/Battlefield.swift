@@ -1,14 +1,20 @@
 import Foundation
 
+
+
+
+
 class Battlefield
 {
     var field: Array<Square> = []
     var ships: Array<Ship> = []
+    
     struct Square
     {
         var showStatus: String
         var name: String
         var status: Int8 = 0  //0 - clear, 1 - killed, 2 - ship exist, -1 - error(nil)
+        var shipId = -1 // -1//clear
         func compareSquare(sq:Square)->Bool
         {
             if self.showStatus == sq.showStatus && self.name == sq.name && self.status == sq.status { return true }
@@ -65,31 +71,61 @@ class Battlefield
         }
         return Square(showStatus: "", name: "",status: -1)
     }
-   private func AddAllShips(arr:Array<Square>) -> Void
+    func AddAllShips() -> Void
     {
-        var tmpArr : Array<Square>
+        if field.count == 100
+        {
+        var tmpArr : Array<Square>,index = 0,flag = false,tryes = 0
         ships = Ship().generateShips(bigShip: 1,mediumShip: 2,littleShip: 3,smalletsShip: 4)
         var c = 0//pos: false - vertical
-        for ship in ships
+        while index < ships.count
         {
+            tryes = 0
+            while flag == false
+            {
             c = Int.random(in: 1...99)
-            tmpArr = getArrSquare(startCoordinaties: c, count: Int8(ship.getLenght()), vertical: true)
+            tmpArr = getArrSquare(startCoordinaties: &c, count: Int8(ships[index].getLenght()), vertical: true)
             if checkVertical(arr: tmpArr){
+                addShipOnField(coordinaties: tmpArr, ship: &ships[index], shipId: index)
+            }
+            if ships[index].getLenght() != 1{
+                tmpArr = getArrSquare(startCoordinaties: &c, count: Int8(ships[index].getLenght()), vertical: false)
+                if checkVertical(arr: tmpArr) {
+                    addShipOnField(coordinaties: tmpArr, ship: &ships[index], shipId: index)
+                }
+              }
+                tryes+=1
+                if(tryes == 40){ flag = true }
+            }
+            flag = false
+            index+=1
                 
             }
-            if ship.getLenght() != 1{
-                tmpArr = getArrSquare(startCoordinaties: c, count: Int8(ship.getLenght()), vertical: false)
-                if checkVertical(arr: tmpArr) {
-                    
-                }
-            }
+        }
+        else{
+            print("Field not exist!")
+            return
         }
     }
-    private func getArrSquare(startCoordinaties coord:Int, count:Int8,vertical vh: Bool) -> Array<Square>{
+    private func addShipOnField(coordinaties:Array<Square>,ship : inout Ship,shipId:Int) -> Void{
+        var index = 0
+        for coord in coordinaties{
+           index = indexFieldByElem(square: coord)
+            field[index].status = 2
+            field[index].shipId = shipId
+            ship.shipActivated()
+        }
+    }
+    private func getArrSquare(startCoordinaties coord: inout Int, count:Int8,vertical vh: Bool) -> Array<Square>{
     //left|up - true //  / horizon - true
         var tmpArr : Array<Square> = [],i = 0, c=count
         while i < count{
-            if vh {tmpArr.append(field[coord + Int(c * 10)])}
+            if vh {
+                if coord + Int(c*10) > 99{
+                    coord = coord - ((coord + Int(c*10))-99)
+                }
+                tmpArr.append(field[coord + Int(c * 10)])
+            }
             if !vh {tmpArr.append(field[coord + Int(c)])}
             c-=1
             i+=1
@@ -123,9 +159,10 @@ class Battlefield
     
     private func checkNaighbors(num:Int,coord: Int, countArr: Int8, vertical vh: Bool) -> Bool
     {
-        var i = 0, neighbor : Array<Square>, n = num
+        var i = 0, neighbor : Array<Square>, n = num,tmp = 0
         while i < 2{
-            neighbor = getArrSquare(startCoordinaties: coord+n, count: countArr, vertical: vh)
+            tmp = coord+n
+            neighbor = getArrSquare(startCoordinaties: &tmp, count: countArr, vertical: vh)
             if !checkSquare(arr: neighbor, vertical: vh){
                 return false
             }
@@ -182,7 +219,7 @@ class Battlefield
         print("|--------------------|")
         print("|",terminator: "")
         for f in field{
-            print("\(f.showStatus) ",terminator: "")
+            print("\(f.shipId) ",terminator: "")
             i+=1
             if i == 10
             {
